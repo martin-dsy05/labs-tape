@@ -5,6 +5,11 @@ on:
   push:
     branches: ["**"]
   workflow_dispatch:
+    inputs:
+      external_registries:
+        description: Run original public-registry compatibility tests
+        type: boolean
+        default: false
 
 permissions:
   contents: read
@@ -29,7 +34,12 @@ jobs:
         run: go vet -mod=vendor ./...
       - name: Local unit tests
         run: go test -mod=vendor -count=1 -timeout=5m ./manifest/image ./manifest/loader ./manifest/imagescanner
-      - name: Complete suite (includes external registries)
+      - name: Complete suite (controlled local registry)
+        run: go test -mod=vendor -count=1 -timeout=10m ./...
+      - name: Optional public-registry compatibility tests
+        if: github.event_name == 'workflow_dispatch' && inputs.external_registries
+        env:
+          TAPE_EXTERNAL_TESTS: "1"
         run: go test -mod=vendor -count=1 -timeout=10m ./...
 
   image:
