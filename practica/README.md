@@ -30,6 +30,12 @@ imagenes ni corrige sus permisos de acceso.
 
 ## Publicacion
 
+Se corrigio el tratamiento de `--help`: la biblioteca devuelve `*flags.Error`
+con tipo `ErrHelp`, pero el CLI comparaba con `flags.ErrorType`. La ayuda se
+registraba como fallo y devolvia 1. Ahora se muestra la ayuda con salida 0;
+las opciones desconocidas siguen devolviendo 1. Las pruebas de regresion cubren
+`--help`, `-h`, ayuda de `images` y una opcion invalida.
+
 El trabajo de imagen depende de las comprobaciones. En ramas y pull requests
 construye y comprueba `tape --help` sin publicar. Solo un push a `main` con
 comprobaciones satisfactorias puede publicar en `ghcr.io/<cuenta>/<repositorio>`.
