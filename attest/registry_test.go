@@ -18,6 +18,7 @@ import (
 	"github.com/docker/labs-brown-tape/manifest/loader"
 	"github.com/docker/labs-brown-tape/manifest/testdata"
 	"github.com/docker/labs-brown-tape/oci"
+	"github.com/docker/labs-brown-tape/trex"
 	// "github.com/docker/labs-brown-tape/trex"
 )
 
@@ -29,11 +30,13 @@ var (
 const repeat = 3
 
 func TestRegistry(t *testing.T) {
+	trex.RunShared()
+	craneOptions = trex.Shared.CraneOptions()
 	// trex.RunShared()
 	// craneOptions = trex.Shared.CraneOptions()
 	// makeDestination = trex.Shared.NewUniqueRepoNamer("bpt-registry-test")
 
-	cases := testdata.BaseYAMLCasesWithDigests(t)
+	cases := testdata.RegistryCases(t, "../")
 	cases.Run(t, ("../"), makeRegistryTest)
 }
 

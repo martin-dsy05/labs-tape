@@ -2,6 +2,7 @@ package app
 
 import (
 	"context"
+	"fmt"
 	"os"
 	"os/signal"
 	"strings"
@@ -39,6 +40,10 @@ type OutputManifestDirOptions struct {
 }
 
 func Run() int {
+	return run(os.Args[1:])
+}
+
+func run(args []string) int {
 	ctx, stop := signal.NotifyContext(context.Background(), os.Interrupt)
 	defer stop()
 
@@ -102,10 +107,11 @@ func Run() int {
 		}
 	}
 
-	if _, err := fp.Parse(); err != nil {
+	if _, err := fp.ParseArgs(args); err != nil {
 		switch flagsErr := err.(type) {
-		case flags.ErrorType:
-			if flagsErr == flags.ErrHelp {
+		case *flags.Error:
+			if flagsErr.Type == flags.ErrHelp {
+				fmt.Fprintln(os.Stdout, flagsErr.Error())
 				return 0
 			}
 			tape.log.Errorf("failed to parse flags: %s", err)
