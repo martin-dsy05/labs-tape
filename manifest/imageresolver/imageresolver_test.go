@@ -11,10 +11,12 @@ import (
 	"github.com/docker/labs-brown-tape/manifest/loader"
 	"github.com/docker/labs-brown-tape/manifest/testdata"
 	"github.com/docker/labs-brown-tape/manifest/types"
+	"github.com/docker/labs-brown-tape/oci"
+	"github.com/docker/labs-brown-tape/trex"
 )
 
 func TestImageResover(t *testing.T) {
-	cases := testdata.BaseYAMLCasesWithDigests(t)
+	cases := testdata.RegistryCases(t, "../../")
 
 	cases.Run(t, ("../../"), makeImageResolverTest)
 }
@@ -38,7 +40,7 @@ func makeImageResolverTest(tc testdata.TestCase) func(t *testing.T) {
 
 		images := scanner.GetImages()
 		// TODO: should this use fake resolver to avoid network traffic or perhaps pre-cache images in trex?
-		resolver := NewRegistryResolver(nil)
+		resolver := NewRegistryResolver(oci.NewClient(trex.Shared.CraneOptions()))
 		g.Expect(resolver.ResolveDigests(ctx, images)).To(Succeed())
 
 		images.MakeAliases()
